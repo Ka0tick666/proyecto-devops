@@ -1,18 +1,24 @@
 version: '3.8'
 services:
   back-despachos:
-    build: ./back-Despachos_SpringBoot
+    build:
+      context: ./back-Despachos_SpringBoot
+      dockerfile: Dockerfile
     ports: ["8081:8080"]
     networks: [innova-net]
-    volumes: [data-despachos:/app/data] # Persistencia exigida
+    volumes: [data-despachos:/app/data]
 
   back-ventas:
-    build: ./back-Ventas_SpringBoot
+    build:
+      context: ./back-Ventas_SpringBoot
+      dockerfile: Dockerfile
     ports: ["8082:8080"]
     networks: [innova-net]
 
   frontend:
-    build: ./front_despacho
+    build:
+      context: ./front_despacho
+      dockerfile: Dockerfile # Asegúrate que DENTRO de front_despacho haya un Dockerfile
     ports: ["80:3000"]
     networks: [innova-net]
     depends_on: [back-despachos, back-ventas]
@@ -23,4 +29,3 @@ networks:
 
 volumes:
   data-despachos:
-  # Intento final
