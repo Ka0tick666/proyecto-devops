@@ -29,3 +29,4 @@ jobs:
             # Forzamos la reconstrucción
             docker-compose down
             docker-compose up -d --build
+#frontend 80, despachos 8081, ventas 8082, 22 ssh y 3036 la base de datos
