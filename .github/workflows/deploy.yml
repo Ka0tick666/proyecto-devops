@@ -1,0 +1,32 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches: [ deploy ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v3
+
+      - name: Desplegar en EC2 via SSH
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_IP }}
+          username: ec2-user
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          command_timeout: 30m
+          script: |
+            mkdir -p /home/ec2-user/proyecto
+            cd /home/ec2-user/proyecto
+            if [ -d ".git" ]; then
+              git pull origin deploy
+            else
+              git clone -b deploy https://github.com/${{ github.repository }}.git .
+            fi
+            # Forzamos la reconstrucción
+            docker-compose down
+            docker-compose up -d --build
+#frontend 80, despachos 8081, ventas 8082, 22 ssh y 3036 la base de datos
