@@ -1,14 +1,14 @@
-name: Deploy Innovatech a AWS
+name: Deploy to EC2
 
 on:
   push:
-    branches: [ "deploy" ]
+    branches: [ deploy ]
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout del codigo
+      - name: Checkout del código
         uses: actions/checkout@v3
 
       - name: Desplegar en EC2 via SSH
@@ -17,6 +17,7 @@ jobs:
           host: ${{ secrets.EC2_IP }}
           username: ec2-user
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          command_timeout: 30m
           script: |
             mkdir -p /home/ec2-user/proyecto
             cd /home/ec2-user/proyecto
@@ -25,5 +26,6 @@ jobs:
             else
               git clone -b deploy https://github.com/${{ github.repository }}.git .
             fi
-            # Comando forzado para evitar Buildx
-            sudo DOCKER_BUILDKIT=0 docker-compose up -d --build
+            # Forzamos la reconstrucción
+            docker-compose down
+            docker-compose up -d --build
