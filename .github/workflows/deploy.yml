@@ -25,7 +25,5 @@ jobs:
             else
               git clone -b deploy https://github.com/${{ github.repository }}.git .
             fi
-            # Agregamos esta variable para desactivar Buildx
-            export DOCKER_BUILDKIT=0
-            export COMPOSE_DOCKER_CLI_BUILD=0
-            docker-compose up -d --build
+            # Comando forzado para evitar Buildx
+            sudo DOCKER_BUILDKIT=0 docker-compose up -d --build
