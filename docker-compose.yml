@@ -1,27 +1,70 @@
 version: '3.8'
 
 services:
+  # --- BASE DE DATOS ---
+  db-mysql:
+    image: mysql:8.0
+    container_name: db-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: innovatech_db
+      MYSQL_USER: user_innova
+      MYSQL_PASSWORD: userpassword
+    ports:
+      - "3306:3306"
+    networks:
+      - innova-net
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+  # --- API DESPACHOS ---
   back-despachos:
     build:
       context: ./back-Despachos_SpringBoot
+    container_name: proyecto-back-despachos-1
     ports:
       - "8081:8080"
     networks:
       - innova-net
-    volumes:
-      - data-despachos:/app/data
+    depends_on:
+      - db-mysql
+    environment:
+      - DB_ENDPOINT=db-mysql
+      - DB_PORT=3306
+      - DB_NAME=innovatech_db
+      - DB_USER=user_innova
+      - DB_PASS=userpassword
+      # Estas variables deben coincidir con tu application.properties
+      - SPRING_DATASOURCE_URL=jdbc:mysql://db-mysql:3306/innovatech_db?allowPublicKeyRetrieval=true&useSSL=false
+      - SPRING_DATASOURCE_USERNAME=user_innova
+      - SPRING_DATASOURCE_PASSWORD=userpassword
 
+  # --- API VENTAS ---
   back-ventas:
     build:
       context: ./back-Ventas_SpringBoot
+    container_name: proyecto-back-ventas-1
     ports:
       - "8082:8080"
     networks:
       - innova-net
+    depends_on:
+      - db-mysql
+    environment:
+      - DB_ENDPOINT=db-mysql
+      - DB_PORT=3306
+      - DB_NAME=innovatech_db
+      - DB_USER=user_innova
+      - DB_PASS=userpassword
+      - SPRING_DATASOURCE_URL=jdbc:mysql://db-mysql:3306/innovatech_db?allowPublicKeyRetrieval=true&useSSL=false
+      - SPRING_DATASOURCE_USERNAME=user_innova
+      - SPRING_DATASOURCE_PASSWORD=userpassword
 
+  # --- FRONTEND ---
   frontend:
     build:
       context: ./front_despacho
+    container_name: proyecto-frontend-1
     ports:
       - "80:80"
     networks:
@@ -35,4 +78,4 @@ networks:
     driver: bridge
 
 volumes:
-  data-despachos:
+  mysql-data:
