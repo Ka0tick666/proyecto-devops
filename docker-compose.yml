@@ -1,0 +1,26 @@
+version: '3.8'
+services:
+  back-despachos:
+    build: ./back-Despachos_SpringBoot
+    ports: ["8081:8080"]
+    networks: [innova-net]
+    volumes: [data-despachos:/app/data] # Persistencia exigida
+
+  back-ventas:
+    build: ./back-Ventas_SpringBoot
+    ports: ["8082:8080"]
+    networks: [innova-net]
+
+  frontend:
+    build: ./front_despacho
+    ports: ["80:3000"]
+    networks: [innova-net]
+    depends_on: [back-despachos, back-ventas]
+
+networks:
+  innova-net:
+    driver: bridge
+
+volumes:
+  data-despachos:
+  # Intento final
